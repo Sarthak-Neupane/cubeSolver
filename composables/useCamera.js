@@ -4,10 +4,10 @@ export const useCamera = options => {
     let camera
     if (options.cameraType == 'Perspective') {
       camera = new nuxtApp.$three.PerspectiveCamera(
-        options.fov || 75,
-        options.aspect || window.innerWidth / window.innerHeight,
-        options.near || 0.1,
-        options.far || 1000
+        options.fov,
+        options.aspect,
+        options.near,
+        options.far
       )
       camera.position.set(options.position.x, options.position.y, options.position.z)
     } else {

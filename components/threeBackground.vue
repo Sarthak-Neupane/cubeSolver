@@ -12,6 +12,8 @@ import vertexShader from '~/shaders/vertex.glsl'
 
 const { $three } = useNuxtApp()  // plugins
 const { $orbitControls } = useNuxtApp()  // plugins
+const { $gltfLoader } = useNuxtApp()  // plugins
+// const { useScene, useCamera, useRenderer } = useNuxtApp()  // plugins
 
 const { width, height } = useWindowSize()  // vueuse
 const { pixelRatio } = useDevicePixelRatio() // vueuse
@@ -29,8 +31,9 @@ const aspect = computed(() => width.value / height.value)
 const scene = useScene()
 const camera = useCamera({
     cameraType: 'Perspective',
-    position: { x: 0, y: 0, z: 0.5 },
-    fov: (180 * (2 * Math.atan(height.value / 2 / 0.5))) / Math.PI,
+    position: { x: 0, y: 0, z: 10 },
+    fov: 75,
+    // fov: (180 * (2 * Math.atan(height.value / 2 / 0.5))) / Math.PI,
     aspect: aspect.value,
     near: 0.1,
     far: 1000,
@@ -38,20 +41,27 @@ const camera = useCamera({
 
 scene.add(camera)
 
-const geometry = new $three.BoxGeometry(75, 75, 75);
-const material = new $three.ShaderMaterial({
-    side: $three.DoubleSide,
-    vertexShader: vertexShader,
-    fragmentShader: fragmentShader,
-    uniforms: {
-        time: time.value,
-        resolution: { value: new $three.Vector2(width.value, height.value) },
-        uProgress: uProgress.value
-    },
-});
-// const material = new $three.MeshNormalMaterial();
-const mesh = new $three.Mesh(geometry, material);
-scene.add(mesh);
+
+// const geometry = new $three.BoxGeometry( 1, 1, 1, 20, 20, 20 );
+// const material = new $three.MeshBasicMaterial({
+//     color: 0xff0000,
+//     side: $three.DoubleSide,
+// });
+
+// const mesh = new $three.Mesh(geometry, material);
+// scene.add(mesh);
+
+const addLights = () => {
+    const ambient = new $three.AmbientLight({
+        color: 0xffffff,
+        intensity: 10,
+    });
+    const directional = new $three.DirectionalLight({
+        color: 0xffffff,
+        intensity: 10,
+    });
+    scene.add(ambient, directional);
+}
 
 const createRenderer = () => {
     if (threeElem.value) {
@@ -76,6 +86,20 @@ const setRenderer = () => {
         pixelRatio: pixelRatio.value,
         scene: scene,
         camera: camera,
+    })
+    addLights()
+    loadModel()
+}
+
+const loadModel = () => {
+    const loader = new $gltfLoader()
+    loader.load('assets/scene.gltf', (gltf) => {
+        scene.add(gltf.scene)
+        gltf.scene.position.set(0, 0, 0)
+        gltf.scene.scale.set(35, 35, 35)
+        console.log(gltf)
+    }, () => { }, (error) => {
+        console.log(error)
     })
 }
 
