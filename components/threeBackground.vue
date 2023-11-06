@@ -11,12 +11,14 @@ import fragmentShader from '~/shaders/fragment.glsl'
 import vertexShader from '~/shaders/vertex.glsl'
 
 const { $three } = useNuxtApp()  // plugins
+const { $orbitControls } = useNuxtApp()  // plugins
 
 const { width, height } = useWindowSize()  // vueuse
 const { pixelRatio } = useDevicePixelRatio() // vueuse
 
 const threeElem = ref(null)
 const renderer = ref(null)
+const orbitControl = ref(null)
 
 const time = ref(0)
 const uProgress = ref(0)
@@ -36,7 +38,7 @@ const camera = useCamera({
 
 scene.add(camera)
 
-const geometry = new $three.PlaneGeometry(250, 250, 100, 100);
+const geometry = new $three.BoxGeometry(75, 75, 75);
 const material = new $three.ShaderMaterial({
     side: $three.DoubleSide,
     vertexShader: vertexShader,
@@ -47,6 +49,7 @@ const material = new $three.ShaderMaterial({
         uProgress: uProgress.value
     },
 });
+// const material = new $three.MeshNormalMaterial();
 const mesh = new $three.Mesh(geometry, material);
 scene.add(mesh);
 
@@ -61,6 +64,7 @@ const createRenderer = () => {
         })
         setRenderer()
     }
+    orbitControl.value = new $orbitControls(camera, renderer.value.domElement)
 }
 
 const setRenderer = () => {
@@ -78,8 +82,9 @@ const setRenderer = () => {
 watch(aspect, () => {
     updateCamera(camera, {
         aspect: aspect.value,
-        fov : (180 * (2 * Math.atan(height.value / 2 / 0.5))) / Math.PI,
+        fov: (180 * (2 * Math.atan(height.value / 2 / 0.5))) / Math.PI,
     })
+    orbitControl.value.update()
     setRenderer()
 })
 
