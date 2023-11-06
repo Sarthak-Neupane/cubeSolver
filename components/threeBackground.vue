@@ -13,7 +13,6 @@ import vertexShader from '~/shaders/vertex.glsl'
 const { $three } = useNuxtApp()  // plugins
 const { $orbitControls } = useNuxtApp()  // plugins
 const { $gltfLoader } = useNuxtApp()  // plugins
-// const { useScene, useCamera, useRenderer } = useNuxtApp()  // plugins
 
 const { width, height } = useWindowSize()  // vueuse
 const { pixelRatio } = useDevicePixelRatio() // vueuse
@@ -22,11 +21,64 @@ const threeElem = ref(null)
 const renderer = ref(null)
 const orbitControl = ref(null)
 
+
 const time = ref(0)
 const uProgress = ref(0)
 
 const aspect = computed(() => width.value / height.value)
 
+const gRubiks = new $three.Group()
+
+
+const cubeThreeFaces = [
+    { x: -1, y: -1, z: -1 },
+    { x: 1, y: -1, z: -1 },
+    { x: -1, y: 1, z: -1 },
+    { x: 1, y: 1, z: -1 },
+    { x: -1, y: -1, z: 1 },
+    { x: 1, y: -1, z: 1 },
+    { x: -1, y: 1, z: 1 },
+    { x: 1, y: 1, z: 1 }
+]
+
+const cubeTwoFaces = [
+    { x: 0, y: 1, z: 1 },
+    { x: 0, y: -1, z: 1 },
+    { x: 1, y: 0, z: 1 },
+    { x: -1, y: 0, z: 1 },
+    { x: 0, y: 1, z: -1 },
+    { x: 0, y: -1, z: -1 },
+    { x: 1, y: 0, z: -1 },
+    { x: -1, y: 0, z: -1 },
+    { x: 1, y: 1, z: 0 },
+    { x: 1, y: -1, z: 0 },
+    { x: -1, y: 1, z: 0 },
+    { x: -1, y: -1, z: 0 },
+]
+
+const cubeSingleFaces = [
+    { x: 0, y: 0, z: 1, color: 0x0000ff },
+    { x: 0, y: 0, z: -1, color: 0xffffff },
+    { x: 0, y: 1, z: 0, color: 0xff0000 },
+    { x: 0, y: -1, z: 0, color: 0xffff00 },
+    { x: 1, y: 0, z: 0, color: 0x00ff00 },
+    { x: -1, y: 0, z: 0, color: 0xffa500 },
+]
+
+
+const colors = [
+    0x000000,
+    0xffffff,
+    0xff0000,
+    0x0000ff,
+    0x00ff00,
+    0xffff00,
+    0xffa500,
+]
+
+const cubeNoFaces = [
+    { x: 0, y: 0, z: 0 },
+]
 
 const scene = useScene()
 const camera = useCamera({
@@ -42,14 +94,41 @@ const camera = useCamera({
 scene.add(camera)
 
 
-// const geometry = new $three.BoxGeometry( 1, 1, 1, 20, 20, 20 );
-// const material = new $three.MeshBasicMaterial({
-//     color: 0xff0000,
-//     side: $three.DoubleSide,
-// });
+const geometry = new $three.BoxGeometry(1, 1, 1, 20, 20, 20);
+const material = new $three.MeshBasicMaterial({
+    color: 0x000000,
+    side: $three.DoubleSide,
+});
 
-// const mesh = new $three.Mesh(geometry, material);
-// scene.add(mesh);
+
+const buildTheCube = () => {
+    for (let i = -1; i < 2; i++) {
+        for (let j = -1; j < 2; j++) {
+            for (let k = -1; k < 2; k++) {
+                const geometryCloned = geometry.clone()
+                const materialCloned = material.clone()
+                const mesh = new $three.Mesh(geometryCloned, materialCloned)
+                mesh.position.set(i, j, k)
+                gRubiks.add(mesh)
+                scene.add(mesh)
+            }
+        }
+    }
+    console.log(scene)
+}
+
+const colorCenter = ()=>{
+    cubeSingleFaces.forEach((e, i)=>{
+        scene.children.forEach((child)=>{
+            if (!child.isMesh) return
+            if(child.position.x === e.x && child.position.y === e.y && child.position.z === e.z){
+                child.material.color.set(e.color)
+            }
+        })
+    })
+    console.log(scene)
+}
+
 
 const addLights = () => {
     const ambient = new $three.AmbientLight({
@@ -88,7 +167,9 @@ const setRenderer = () => {
         camera: camera,
     })
     addLights()
-    loadModel()
+    buildTheCube()
+    colorCenter()
+    // loadModel()
 }
 
 const loadModel = () => {
