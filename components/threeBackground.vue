@@ -36,32 +36,53 @@ const orange = new $three.Color(0xffa500)
 const white = new $three.Color(0xffffff)
 const BLACK_COLOR = new $three.Color(0x000000)
 
+const red_texture = new $three.TextureLoader().load('assets/Cube/Group 2.png')
+const blue_texture = new $three.TextureLoader().load('assets/Cube/Group 3.png')
+const green_texture = new $three.TextureLoader().load('assets/Cube/Group 4.png')
+const yellow_texture = new $three.TextureLoader().load('assets/Cube/Group 5.png')
+const orange_texture = new $three.TextureLoader().load('assets/Cube/Group 6.png')
+const white_texture = new $three.TextureLoader().load('assets/Cube/Group 1.png')
+const black_texture = new $three.TextureLoader().load('assets/Cube/Group 7.png')
+
+
 
 const cubeThreeFaces = [
-    {x: -1, y: -1, z: -1, colors: [BLACK_COLOR, orange, BLACK_COLOR, yellow, BLACK_COLOR, white]},
-    { x: 1, y: -1, z: -1, colors: [green, BLACK_COLOR, BLACK_COLOR, yellow, BLACK_COLOR, white] },
-    { x: -1, y: 1, z: -1, colors: [BLACK_COLOR, orange, red, BLACK_COLOR, BLACK_COLOR, white] },
-    { x: 1, y: 1, z: -1, colors: [ green, BLACK_COLOR, red, BLACK_COLOR, BLACK_COLOR, white ] },
-    { x: -1, y: -1, z: 1, colors: [ BLACK_COLOR, orange, BLACK_COLOR, yellow, blue, BLACK_COLOR ] },
-    { x: 1, y: -1, z: 1, colors: [ green, BLACK_COLOR, BLACK_COLOR, yellow, blue, BLACK_COLOR ] },
-    { x: -1, y: 1, z: 1, colors: [ BLACK_COLOR, orange, red, BLACK_COLOR, blue, BLACK_COLOR ] },
-    { x: 1, y: 1, z: 1, colors: [green, BLACK_COLOR, red, BLACK_COLOR, blue, BLACK_COLOR] }
+    {x: -1, y: -1, z: -1, textures: [black_texture, orange_texture, black_texture, yellow_texture, black_texture, white_texture]},
+    { x: 1, y: -1, z: -1, textures: [green_texture, black_texture, black_texture, yellow_texture, black_texture, white_texture] },
+    { x: -1, y: 1, z: -1, textures: [black_texture, orange_texture, red_texture, black_texture, black_texture, white_texture] },
+    { x: 1, y: 1, z: -1, textures: [ green_texture, black_texture, red_texture, black_texture, black_texture, white_texture ] },
+    { x: -1, y: -1, z: 1, textures: [ black_texture, orange_texture, black_texture, yellow_texture, blue_texture, black_texture ] },
+    { x: 1, y: -1, z: 1, textures: [ green_texture, black_texture, black_texture, yellow_texture, blue_texture, black_texture ] },
+    { x: -1, y: 1, z: 1, textures: [ black_texture, orange_texture, red_texture, black_texture, blue_texture, black_texture ] },
+    { x: 1, y: 1, z: 1, textures: [green_texture, black_texture, red_texture, black_texture, blue_texture, black_texture] }
 ]
 
 const cubeTwoFaces = [
-    { x: 0, y: 1, z: 1, colors: [BLACK_COLOR, blue, BLACK_COLOR, red, BLACK_COLOR, BLACK_COLOR] },
-    { x: 0, y: -1, z: 1, colors: [BLACK_COLOR, blue, yellow, BLACK_COLOR, BLACK_COLOR, BLACK_COLOR] },
-    { x: 1, y: 0, z: 1, colors: [BLACK_COLOR, blue, BLACK_COLOR, BLACK_COLOR, BLACK_COLOR, green] },
-    { x: -1, y: 0, z: 1, colors: [BLACK_COLOR, blue, BLACK_COLOR, BLACK_COLOR, orange, BLACK_COLOR] },
-    { x: 0, y: 1, z: -1, colors: [white, BLACK_COLOR, BLACK_COLOR, red, BLACK_COLOR, BLACK_COLOR] },
-    { x: 0, y: -1, z: -1, colors: [white, BLACK_COLOR, yellow, BLACK_COLOR, yellow, BLACK_COLOR] },
-    { x: 1, y: 0, z: -1, colors: [white, BLACK_COLOR, BLACK_COLOR, BLACK_COLOR, BLACK_COLOR, green] },
-    { x: -1, y: 0, z: -1, colors: [white, BLACK_COLOR, BLACK_COLOR, BLACK_COLOR, orange, BLACK_COLOR] },
-    { x: 1, y: 1, z: 0, colors: [BLACK_COLOR, BLACK_COLOR, BLACK_COLOR, red, BLACK_COLOR, green] },
-    { x: 1, y: -1, z: 0, colors: [BLACK_COLOR, BLACK_COLOR, yellow, BLACK_COLOR, BLACK_COLOR, green] },
-    { x: -1, y: 1, z: 0, colors: [BLACK_COLOR, BLACK_COLOR, BLACK_COLOR, red, orange, BLACK_COLOR] },
-    { x: -1, y: -1, z: 0, colors: [BLACK_COLOR, BLACK_COLOR, yellow, BLACK_COLOR, orange, BLACK_COLOR] },
+    { x: 0, y: 1, z: 1, textures: [black_texture, blue_texture, black_texture, red_texture, black_texture, black_texture] },
+    { x: 0, y: -1, z: 1, textures: [black_texture, blue_texture, yellow_texture, black_texture, black_texture, black_texture] },
+    { x: 1, y: 0, z: 1, textures: [black_texture, blue_texture, black_texture, black_texture, black_texture, green_texture] },
+    { x: -1, y: 0, z: 1, textures: [black_texture, blue_texture, black_texture, black_texture, orange_texture, black_texture] },
+    { x: 0, y: 1, z: -1, textures: [white_texture, black_texture, black_texture, red_texture, black_texture, black_texture] },
+    { x: 0, y: -1, z: -1, textures: [white_texture, black_texture, yellow_texture, black_texture, black_texture, black_texture] },
+    { x: 1, y: 0, z: -1, textures: [white_texture, black_texture, black_texture, black_texture, black_texture, green_texture] },
+    { x: -1, y: 0, z: -1, textures: [white_texture, black_texture, black_texture, black_texture, orange_texture, black_texture] },
+    { x: 1, y: 1, z: 0, textures: [black_texture, black_texture, black_texture, red_texture, black_texture, green_texture] },
+    { x: 1, y: -1, z: 0, textures: [black_texture, black_texture, yellow_texture, black_texture, black_texture, green_texture] },
+    { x: -1, y: 1, z: 0, textures: [black_texture, black_texture, black_texture, red_texture, orange_texture, black_texture] },
+    { x: -1, y: -1, z: 0, textures: [black_texture, black_texture, yellow_texture, black_texture, orange_texture, black_texture] },
 ]
+// ======, blue, ======, red, ======, ======
+// ======, blue, yellow, ======, ======, ======
+// ======, blue, ======, ======, ======, green
+// ======, blue, ======, ======, orange, ======
+// white, ======, ======, red, ======, ======
+// white, ======, yellow, ======, ======, ======
+// white, ======, ======, ======, ======, green
+// white, ======, ======, ======, orange, ======
+// ======, ======, ======, red, ======, green
+// ======, ======, yellow, ======, ======, green
+// ======, ======, ======, red, orange, ======
+// ======, ======, yellow, ======, orange, ======
 
 const colors = [
     white,
@@ -73,17 +94,17 @@ const colors = [
 ]
 
 const cubeSingleFaces = [
-    { x: 0, y: 0, z: 1, color: blue },
-    { x: 0, y: 0, z: -1, color: white },
-    { x: 0, y: 1, z: 0, color: red },
-    { x: 0, y: -1, z: 0, color: yellow },
-    { x: 1, y: 0, z: 0, color: green },
-    { x: -1, y: 0, z: 0, color: orange },
+    { x: 0, y: 0, z: 1, map: blue_texture },
+    { x: 0, y: 0, z: -1, map: white_texture },
+    { x: 0, y: 1, z: 0, map: red_texture },
+    { x: 0, y: -1, z: 0, map: yellow_texture },
+    { x: 1, y: 0, z: 0, map: green_texture },
+    { x: -1, y: 0, z: 0, map: orange_texture },
 ]
 
 
 const cubeNoFaces = [
-    { x: 0, y: 0, z: 0, color: BLACK_COLOR },
+    { x: 0, y: 0, z: 0, map: black_texture },
 ]
 
 const scene = useScene()
@@ -103,7 +124,7 @@ scene.add(camera)
 const geometry = new $three.BoxGeometry(1, 1, 1, 20, 20, 20);
 geometry.needsUpdate = true
 const material = new $three.MeshBasicMaterial({
-    color: 0x000000,
+    map: black_texture,
     side: $three.DoubleSide,
 });
 
@@ -124,12 +145,12 @@ const buildTheCube = () => {
                     const findExactCube = cubeThreeFaces.find((e) => e.x === i && e.y === j && e.z === k)
                     if(findExactCube){
                         mesh.material = [
-                            new $three.MeshBasicMaterial({ color: findExactCube.colors[0] }),
-                            new $three.MeshBasicMaterial({ color: findExactCube.colors[1] }),
-                            new $three.MeshBasicMaterial({ color: findExactCube.colors[2] }),
-                            new $three.MeshBasicMaterial({ color: findExactCube.colors[3] }),
-                            new $three.MeshBasicMaterial({ color: findExactCube.colors[4] }),
-                            new $three.MeshBasicMaterial({ color: findExactCube.colors[5] }),
+                            new $three.MeshBasicMaterial({ map: findExactCube.textures[0] }),
+                            new $three.MeshBasicMaterial({ map: findExactCube.textures[1] }),
+                            new $three.MeshBasicMaterial({ map: findExactCube.textures[2] }),
+                            new $three.MeshBasicMaterial({ map: findExactCube.textures[3] }),
+                            new $three.MeshBasicMaterial({ map: findExactCube.textures[4] }),
+                            new $three.MeshBasicMaterial({ map: findExactCube.textures[5] }),
                         ]
                     }
                 }
@@ -137,12 +158,12 @@ const buildTheCube = () => {
                     const findExactCube = cubeTwoFaces.find((e) => e.x === i && e.y === j && e.z === k)
                     if (findExactCube) {
                         mesh.material = [
-                            new $three.MeshBasicMaterial({ color: findExactCube.colors[5] }),
-                            new $three.MeshBasicMaterial({ color: findExactCube.colors[4] }),
-                            new $three.MeshBasicMaterial({ color: findExactCube.colors[3] }),
-                            new $three.MeshBasicMaterial({ color: findExactCube.colors[2] }),
-                            new $three.MeshBasicMaterial({ color: findExactCube.colors[1] }),
-                            new $three.MeshBasicMaterial({ color: findExactCube.colors[0] }),
+                            new $three.MeshBasicMaterial({ map: findExactCube.textures[5] }),
+                            new $three.MeshBasicMaterial({ map: findExactCube.textures[4] }),
+                            new $three.MeshBasicMaterial({ map: findExactCube.textures[3] }),
+                            new $three.MeshBasicMaterial({ map: findExactCube.textures[2] }),
+                            new $three.MeshBasicMaterial({ map: findExactCube.textures[1] }),
+                            new $three.MeshBasicMaterial({ map: findExactCube.textures[0] }),
                         ]
                     }
                 }
@@ -157,33 +178,17 @@ const colorCenter = () => {
         scene.children.forEach((child) => {
             if (!child.isMesh) return
             if (child.position.x === e.x && child.position.y === e.y && child.position.z === e.z) {
-                child.material.color.set(e.color)
+                child.material = new $three.MeshBasicMaterial({ map: e.map })
             }
         })
     })
     console.log(scene)
 }
 
-const colorEdges = () => {
-    // cubeThreeFaces.forEach((e, i) => {
-    //     scene.children.forEach((child) => {
-    //         if (!child.isMesh) return
-    //         if (child.position.x === e.x && child.position.y === e.y && child.position.z === e.z) {
-    //             child.material = [
-    //                 new $three.MeshBasicMaterial({ color: BLACK_COLOR }),
-    //                 new $three.MeshBasicMaterial({ color: BLACK_COLOR }),
-    //                 new $three.MeshBasicMaterial({ color: BLACK_COLOR }),
-    //                 new $three.MeshBasicMaterial({ color: BLACK_COLOR }),
-    //                 new $three.MeshBasicMaterial({ color: BLACK_COLOR }),
-    //                 new $three.MeshBasicMaterial({ color: BLACK_COLOR }),
-    //             ]
-    //         }
-    //     })
-    // })
+const loadTextures = () => {
+    const loader = new $three.TextureLoader()
+    
 }
-
-
-
 
 const addLights = () => {
     const ambient = new $three.AmbientLight({
@@ -224,7 +229,6 @@ const setRenderer = () => {
     addLights()
     buildTheCube()
     colorCenter()
-    colorEdges()
     // loadModel()
 }
 
@@ -243,7 +247,8 @@ const loadModel = () => {
 watch(aspect, () => {
     updateCamera(camera, {
         aspect: aspect.value,
-        fov: (180 * (2 * Math.atan(height.value / 2 / 0.5))) / Math.PI,
+        // fov: (180 * (2 * Math.atan(height.value / 2 / 0.5))) / Math.PI,
+        fov: 75
     })
     orbitControl.value.update()
     setRenderer()
