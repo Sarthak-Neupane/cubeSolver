@@ -9,6 +9,35 @@ import { updateRenderer } from '~/helpers/updateRenderer';
 import { updateCamera } from '~/helpers/updateCamera';
 import fragmentShader from '~/shaders/fragment.glsl'
 import vertexShader from '~/shaders/vertex.glsl'
+import gsap from 'gsap';
+
+
+const props = defineProps({
+    F: {
+        type: Number,
+        default: 0
+    },
+    B: {
+        type: Number,
+        default: 0
+    },
+    R: {
+        type: Number,
+        default: 0
+    },
+    L: {
+        type: Number,
+        default: 0
+    },
+    U: {
+        type: Number,
+        default: 0
+    },
+    D: {
+        type: Number,
+        default: 0
+    },
+})
 
 const { $three } = useNuxtApp()  // plugins
 const { $orbitControls } = useNuxtApp()  // plugins
@@ -43,6 +72,15 @@ const yellow_texture = new $three.TextureLoader().load('assets/Cube/yellow.png')
 const orange_texture = new $three.TextureLoader().load('assets/Cube/orange.png')
 const white_texture = new $three.TextureLoader().load('assets/Cube/white.png')
 const black_texture = new $three.TextureLoader().load('assets/Cube/black.png')
+
+const Front_Group = ref()
+let groupF;
+let groupB;
+let groupR;
+let groupL;
+let groupU;
+let groupD;
+
 
 
 
@@ -138,10 +176,14 @@ const buildTheCube = () => {
                 const mesh = new $three.Mesh(geometryCloned, materialCloned)
                 mesh.position.set(i, j, k)
                 gRubiks.add(mesh)
-                scene.add(mesh)
+                scene.add(gRubiks)
                 const sumOfPositions = i + j + k
                 if (i === 0 && j === 0 && k === 0) continue
                 if (i !== 0 && j !== 0 && k !== 0) {
+                    // add user data to the cube
+                    mesh.userData = {
+                        type: 'corner'
+                    }
                     const findExactCube = cubeThreeFaces.find((e) => e.x === i && e.y === j && e.z === k)
                     if(findExactCube){
                         mesh.material = [
@@ -155,6 +197,10 @@ const buildTheCube = () => {
                     }
                 }
                 if (sumOfPositions === 2 || sumOfPositions === -2 || sumOfPositions === 0) {
+                    // add user data to the cube
+                    mesh.userData = {
+                        type: 'face'
+                    }
                     const findExactCube = cubeTwoFaces.find((e) => e.x === i && e.y === j && e.z === k)
                     if (findExactCube) {
                         mesh.material = [
@@ -170,17 +216,71 @@ const buildTheCube = () => {
             }
         }
     }
-    console.log(scene)
+    // console.log(gRubiks)
+    // gRubiks.rotation.set(0, -Math.PI / 4, Math.PI / 4)
 }
 
 const colorCenter = () => {
     cubeSingleFaces.forEach((e, i) => {
-        scene.children.forEach((child) => {
+        gRubiks.children.forEach((child) => {
             if (!child.isMesh) return
             if (child.position.x === e.x && child.position.y === e.y && child.position.z === e.z) {
                 child.material = new $three.MeshBasicMaterial({ map: e.map })
             }
         })
+    })
+}
+
+const setGroups = ()=>{
+    groupF = new $three.Group()
+    groupB = new $three.Group()
+    groupR = new $three.Group()
+    groupL = new $three.Group()
+    groupU = new $three.Group()
+    groupD = new $three.Group()
+    scene.remove(groupF, groupB, groupR, groupL, groupU, groupD)
+    gRubiks.children.forEach((child)=>{
+        if(child.position.z === 1){
+            console.log('child')
+            groupF.add(child)
+        }
+    })
+    gRubiks.children.forEach((child)=>{
+        if(child.position.z === -1){
+            groupB.add(child)
+        }
+    })
+    gRubiks.children.forEach((child) => {
+        if (child.position.x === 1) {
+            groupR.add(child)
+        }
+    })
+    gRubiks.children.forEach((child) => {
+        if (child.position.x === -1) {
+            groupL.add(child)
+        }
+    })
+    gRubiks.children.forEach((child) => {
+        if (child.position.y === 1) {
+            groupU.add(child)
+        }
+    })
+    gRubiks.children.forEach((child) => {
+        if (child.position.y === -1) {
+            groupU.add(child)
+        }
+    })
+    scene.add(groupF, groupB, groupR, groupL, groupU, groupD)
+}   
+
+const rotate = (key)=>{
+    console.log(key)
+    gsap.to(groupF.rotation, {
+        z: props.F * (Math.PI / 2),
+        duration: 0.5,
+        onComplete: ()=>{
+            // setGroups()
+        }
     })
     console.log(scene)
 }
@@ -229,6 +329,7 @@ const setRenderer = () => {
     addLights()
     buildTheCube()
     colorCenter()
+    setGroups()
     // loadModel()
 }
 
@@ -244,14 +345,8 @@ const loadModel = () => {
     })
 }
 
-watch(aspect, () => {
-    updateCamera(camera, {
-        aspect: aspect.value,
-        // fov: (180 * (2 * Math.atan(height.value / 2 / 0.5))) / Math.PI,
-        fov: 75
-    })
-    orbitControl.value.update()
-    setRenderer()
+watch(props, ()=>{
+    rotate('F')
 })
 
 onMounted(() => {
