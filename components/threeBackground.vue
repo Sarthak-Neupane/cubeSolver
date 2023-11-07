@@ -36,13 +36,13 @@ const orange = new $three.Color(0xffa500)
 const white = new $three.Color(0xffffff)
 const BLACK_COLOR = new $three.Color(0x000000)
 
-const red_texture = new $three.TextureLoader().load('assets/Cube/Group 2.png')
-const blue_texture = new $three.TextureLoader().load('assets/Cube/Group 3.png')
-const green_texture = new $three.TextureLoader().load('assets/Cube/Group 4.png')
-const yellow_texture = new $three.TextureLoader().load('assets/Cube/Group 5.png')
-const orange_texture = new $three.TextureLoader().load('assets/Cube/Group 6.png')
-const white_texture = new $three.TextureLoader().load('assets/Cube/Group 1.png')
-const black_texture = new $three.TextureLoader().load('assets/Cube/Group 7.png')
+const red_texture = new $three.TextureLoader().load('assets/Cube/red.png')
+const blue_texture = new $three.TextureLoader().load('assets/Cube/blue.png')
+const green_texture = new $three.TextureLoader().load('assets/Cube/green.png')
+const yellow_texture = new $three.TextureLoader().load('assets/Cube/yellow.png')
+const orange_texture = new $three.TextureLoader().load('assets/Cube/orange.png')
+const white_texture = new $three.TextureLoader().load('assets/Cube/white.png')
+const black_texture = new $three.TextureLoader().load('assets/Cube/black.png')
 
 
 
