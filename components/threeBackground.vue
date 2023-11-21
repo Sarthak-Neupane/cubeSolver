@@ -39,6 +39,12 @@ const props = defineProps({
     },
 })
 
+defineExpose({
+    rotate: (key) => {
+        rotate(key)
+    }
+})
+
 const { $three } = useNuxtApp()  // plugins
 const { $orbitControls } = useNuxtApp()  // plugins
 const { $gltfLoader } = useNuxtApp()  // plugins
@@ -73,15 +79,18 @@ const orange_texture = new $three.TextureLoader().load('assets/Cube/orange.png')
 const white_texture = new $three.TextureLoader().load('assets/Cube/white.png')
 const black_texture = new $three.TextureLoader().load('assets/Cube/black.png')
 
-const Front_Group = ref()
-let groupF;
-let groupB;
-let groupR;
-let groupL;
-let groupU;
-let groupD;
-
-
+let Front_Group = null
+let Right_Group = null
+let Back_Group = null
+let Left_Group = null
+let Up_Group = null
+let Down_Group = null
+let groupF = []
+let groupB = [];
+let groupR = [];
+let groupL  = [];
+let groupU = [];
+let groupD = [];
 
 
 const cubeThreeFaces = [
@@ -174,14 +183,18 @@ const buildTheCube = () => {
                 const geometryCloned = geometry.clone()
                 const materialCloned = material.clone()
                 const mesh = new $three.Mesh(geometryCloned, materialCloned)
-                mesh.position.set(i, j, k)
                 gRubiks.add(mesh)
-                scene.add(gRubiks)
+                mesh.position.set(i, j, k)
+                let position = new $three.Vector3(i, j, k)
+                mesh.userData = {
+                    position: position
+                }
                 const sumOfPositions = i + j + k
                 if (i === 0 && j === 0 && k === 0) continue
                 if (i !== 0 && j !== 0 && k !== 0) {
                     // add user data to the cube
                     mesh.userData = {
+                        ...mesh.userData,
                         type: 'corner'
                     }
                     const findExactCube = cubeThreeFaces.find((e) => e.x === i && e.y === j && e.z === k)
@@ -199,6 +212,7 @@ const buildTheCube = () => {
                 if (sumOfPositions === 2 || sumOfPositions === -2 || sumOfPositions === 0) {
                     // add user data to the cube
                     mesh.userData = {
+                        ...mesh.userData,
                         type: 'face'
                     }
                     const findExactCube = cubeTwoFaces.find((e) => e.x === i && e.y === j && e.z === k)
@@ -216,8 +230,8 @@ const buildTheCube = () => {
             }
         }
     }
-    // console.log(gRubiks)
-    // gRubiks.rotation.set(0, -Math.PI / 4, Math.PI / 4)
+    scene.add(gRubiks)
+    console.log(gRubiks.children)
 }
 
 const colorCenter = () => {
@@ -231,58 +245,100 @@ const colorCenter = () => {
     })
 }
 
+const clearGroups = () => {
+    groupF = []
+    groupB = [];
+    groupR = [];
+    groupL = [];
+    groupU = [];
+    groupD = [];
+    Front_Group = new $three.Group()
+    Right_Group = new $three.Group()
+    Back_Group = new $three.Group()
+    Left_Group = new $three.Group()
+    Up_Group = new $three.Group()
+    Down_Group = new $three.Group()
+}
+
 const setGroups = ()=>{
-    groupF = new $three.Group()
-    groupB = new $three.Group()
-    groupR = new $three.Group()
-    groupL = new $three.Group()
-    groupU = new $three.Group()
-    groupD = new $three.Group()
-    scene.remove(groupF, groupB, groupR, groupL, groupU, groupD)
-    gRubiks.children.forEach((child)=>{
-        if(child.position.z === 1){
-            console.log('child')
-            groupF.add(child)
-        }
+    Front_Group = new $three.Group()
+    Right_Group = new $three.Group()
+    Back_Group = new $three.Group()
+    Left_Group = new $three.Group()
+    Up_Group = new $three.Group()
+    Down_Group = new $three.Group()
+
+    scene.traverse((child) => {
+        if (!child.isMesh) return
+        setProperGroups(child)
     })
-    gRubiks.children.forEach((child)=>{
-        if(child.position.z === -1){
-            groupB.add(child)
-        }
-    })
-    gRubiks.children.forEach((child) => {
-        if (child.position.x === 1) {
-            groupR.add(child)
-        }
-    })
-    gRubiks.children.forEach((child) => {
-        if (child.position.x === -1) {
-            groupL.add(child)
-        }
-    })
-    gRubiks.children.forEach((child) => {
-        if (child.position.y === 1) {
-            groupU.add(child)
-        }
-    })
-    gRubiks.children.forEach((child) => {
-        if (child.position.y === -1) {
-            groupU.add(child)
-        }
-    })
-    scene.add(groupF, groupB, groupR, groupL, groupU, groupD)
 }   
 
+const setProperGroups = (c) => {
+    if (c.userData.position.z === 1) {
+        groupF.push(c)
+    }
+    if (c.userData.position.x === 1) {
+        groupR.push(c)
+    }
+    if (c.userData.position.z === -1) {
+        groupB.push(c)
+    }
+    if (c.userData.position.x === -1) {
+        groupL.push(c)
+    }
+    if (c.userData.position.y === 1) {
+        groupU.push(c)
+    }
+    if (c.userData.position.y === -1) {
+        groupD.push(c)
+    }
+}
+
 const rotate = (key)=>{
-    console.log(key)
-    gsap.to(groupF.rotation, {
-        z: props.F * (Math.PI / 2),
-        duration: 0.5,
-        onComplete: ()=>{
-            // setGroups()
-        }
-    })
-    console.log(scene)
+    if(key == 'F'){
+        groupF.forEach((child) => {
+            Front_Group.attach(child)
+        })
+        scene.add(Front_Group)
+        gsap.to(Front_Group.rotation, {
+            duration: 1,
+            z: Math.PI / 2,
+            onComplete: () => {
+                clearGroups()
+                scene.traverse((child) => {
+                    if (!child.isMesh) return
+                    let vecnew = new $three.Vector3()
+                    child.localToWorld(vecnew)
+                    vecnew.round()
+                    child.userData.position = vecnew
+                    setProperGroups(child)
+                })
+            }
+        })
+    }
+    if(key == 'R'){
+        groupR.forEach((child) => {
+            console.log(child)
+            Right_Group.attach(child)
+        })
+        scene.add(Right_Group)
+        gsap.to(Right_Group.rotation, {
+            duration: 1,
+            x: Math.PI / 2,
+            onComplete: () => {
+                clearGroups()
+                scene.traverse((child) => {
+                    if (!child.isMesh) return
+                    let vecnew = new $three.Vector3()
+                    child.localToWorld(vecnew)
+                    vecnew.round()
+                    child.userData.position = vecnew
+                    setProperGroups(child)
+                })
+            }
+        })
+    }
 }
 
 const loadTextures = () => {
@@ -333,6 +389,7 @@ const setRenderer = () => {
     // loadModel()
 }
 
+
 const loadModel = () => {
     const loader = new $gltfLoader()
     loader.load('assets/scene.gltf', (gltf) => {
@@ -345,14 +402,19 @@ const loadModel = () => {
     })
 }
 
-watch(props, ()=>{
-    rotate('F')
-})
-
 onMounted(() => {
     createRenderer()
 })
 
+watch(aspect, () => {
+    updateCamera(camera, {
+        aspect: aspect.value,
+        fov: 75,
+        // fov: (180 * (2 * Math.atan(height.value / 2 / 0.5))) / Math.PI,
+    })
+    orbitControl.value.update()
+    setRenderer()
+})
 
 useRafFn(() => {
     time.value += 0.01
