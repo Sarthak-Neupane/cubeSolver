@@ -7,6 +7,7 @@
 import { useWindowSize, useDevicePixelRatio, useRafFn } from '@vueuse/core'
 import { updateRenderer } from '~/helpers/updateRenderer';
 import { updateCamera } from '~/helpers/updateCamera';
+import { colorCube } from '~/helpers/colorCube';
 import fragmentShader from '~/shaders/fragment.glsl'
 import vertexShader from '~/shaders/vertex.glsl'
 import gsap from 'gsap';
@@ -63,13 +64,6 @@ const uProgress = ref(0)
 const aspect = computed(() => width.value / height.value)
 
 const gRubiks = new $three.Group()
-const red = new $three.Color(0xff0000)
-const blue = new $three.Color(0x0000ff)
-const green = new $three.Color(0x00ff00)
-const yellow = new $three.Color(0xffff00)
-const orange = new $three.Color(0xffa500)
-const white = new $three.Color(0xffffff)
-const BLACK_COLOR = new $three.Color(0x000000)
 
 const red_texture = new $three.TextureLoader().load('assets/Cube/red.png')
 const blue_texture = new $three.TextureLoader().load('assets/Cube/blue.png')
@@ -88,57 +82,9 @@ let Down_Group = null
 let groupF = []
 let groupB = [];
 let groupR = [];
-let groupL  = [];
+let groupL = [];
 let groupU = [];
 let groupD = [];
-
-
-const cubeThreeFaces = [
-    {x: -1, y: -1, z: -1, textures: [black_texture, orange_texture, black_texture, yellow_texture, black_texture, white_texture]},
-    { x: 1, y: -1, z: -1, textures: [green_texture, black_texture, black_texture, yellow_texture, black_texture, white_texture] },
-    { x: -1, y: 1, z: -1, textures: [black_texture, orange_texture, red_texture, black_texture, black_texture, white_texture] },
-    { x: 1, y: 1, z: -1, textures: [ green_texture, black_texture, red_texture, black_texture, black_texture, white_texture ] },
-    { x: -1, y: -1, z: 1, textures: [ black_texture, orange_texture, black_texture, yellow_texture, blue_texture, black_texture ] },
-    { x: 1, y: -1, z: 1, textures: [ green_texture, black_texture, black_texture, yellow_texture, blue_texture, black_texture ] },
-    { x: -1, y: 1, z: 1, textures: [ black_texture, orange_texture, red_texture, black_texture, blue_texture, black_texture ] },
-    { x: 1, y: 1, z: 1, textures: [green_texture, black_texture, red_texture, black_texture, blue_texture, black_texture] }
-]
-
-const cubeTwoFaces = [
-    { x: 0, y: 1, z: 1, textures: [black_texture, blue_texture, black_texture, red_texture, black_texture, black_texture] },
-    { x: 0, y: -1, z: 1, textures: [black_texture, blue_texture, yellow_texture, black_texture, black_texture, black_texture] },
-    { x: 1, y: 0, z: 1, textures: [black_texture, blue_texture, black_texture, black_texture, black_texture, green_texture] },
-    { x: -1, y: 0, z: 1, textures: [black_texture, blue_texture, black_texture, black_texture, orange_texture, black_texture] },
-    { x: 0, y: 1, z: -1, textures: [white_texture, black_texture, black_texture, red_texture, black_texture, black_texture] },
-    { x: 0, y: -1, z: -1, textures: [white_texture, black_texture, yellow_texture, black_texture, black_texture, black_texture] },
-    { x: 1, y: 0, z: -1, textures: [white_texture, black_texture, black_texture, black_texture, black_texture, green_texture] },
-    { x: -1, y: 0, z: -1, textures: [white_texture, black_texture, black_texture, black_texture, orange_texture, black_texture] },
-    { x: 1, y: 1, z: 0, textures: [black_texture, black_texture, black_texture, red_texture, black_texture, green_texture] },
-    { x: 1, y: -1, z: 0, textures: [black_texture, black_texture, yellow_texture, black_texture, black_texture, green_texture] },
-    { x: -1, y: 1, z: 0, textures: [black_texture, black_texture, black_texture, red_texture, orange_texture, black_texture] },
-    { x: -1, y: -1, z: 0, textures: [black_texture, black_texture, yellow_texture, black_texture, orange_texture, black_texture] },
-]
-// ======, blue, ======, red, ======, ======
-// ======, blue, yellow, ======, ======, ======
-// ======, blue, ======, ======, ======, green
-// ======, blue, ======, ======, orange, ======
-// white, ======, ======, red, ======, ======
-// white, ======, yellow, ======, ======, ======
-// white, ======, ======, ======, ======, green
-// white, ======, ======, ======, orange, ======
-// ======, ======, ======, red, ======, green
-// ======, ======, yellow, ======, ======, green
-// ======, ======, ======, red, orange, ======
-// ======, ======, yellow, ======, orange, ======
-
-const colors = [
-    white,
-    red,
-    blue,
-    green,
-    yellow,
-    orange,
-]
 
 const cubeSingleFaces = [
     { x: 0, y: 0, z: 1, map: blue_texture },
@@ -147,11 +93,6 @@ const cubeSingleFaces = [
     { x: 0, y: -1, z: 0, map: yellow_texture },
     { x: 1, y: 0, z: 0, map: green_texture },
     { x: -1, y: 0, z: 0, map: orange_texture },
-]
-
-
-const cubeNoFaces = [
-    { x: 0, y: 0, z: 0, map: black_texture },
 ]
 
 const scene = useScene()
@@ -192,13 +133,12 @@ const buildTheCube = () => {
                 const sumOfPositions = i + j + k
                 if (i === 0 && j === 0 && k === 0) continue
                 if (i !== 0 && j !== 0 && k !== 0) {
-                    // add user data to the cube
                     mesh.userData = {
                         ...mesh.userData,
                         type: 'corner'
                     }
-                    const findExactCube = cubeThreeFaces.find((e) => e.x === i && e.y === j && e.z === k)
-                    if(findExactCube){
+                    const findExactCube = colorCube('corner', { i, j, k })
+                    if (findExactCube) {
                         mesh.material = [
                             new $three.MeshBasicMaterial({ map: findExactCube.textures[0] }),
                             new $three.MeshBasicMaterial({ map: findExactCube.textures[1] }),
@@ -210,12 +150,11 @@ const buildTheCube = () => {
                     }
                 }
                 if (sumOfPositions === 2 || sumOfPositions === -2 || sumOfPositions === 0) {
-                    // add user data to the cube
                     mesh.userData = {
                         ...mesh.userData,
                         type: 'face'
                     }
-                    const findExactCube = cubeTwoFaces.find((e) => e.x === i && e.y === j && e.z === k)
+                    const findExactCube = colorCube('face', { i, j, k })
                     if (findExactCube) {
                         mesh.material = [
                             new $three.MeshBasicMaterial({ map: findExactCube.textures[5] }),
@@ -260,19 +199,21 @@ const clearGroups = () => {
     Down_Group = new $three.Group()
 }
 
-const setGroups = ()=>{
-    Front_Group = new $three.Group()
-    Right_Group = new $three.Group()
-    Back_Group = new $three.Group()
-    Left_Group = new $three.Group()
-    Up_Group = new $three.Group()
-    Down_Group = new $three.Group()
-
+const updatePosition = () => {
     scene.traverse((child) => {
         if (!child.isMesh) return
+        let vecnew = new $three.Vector3()
+        child.localToWorld(vecnew)
+        vecnew.round()
+        child.userData.position = vecnew
         setProperGroups(child)
     })
-}   
+}
+
+const setGroups = () => {
+    clearGroups()
+    updatePosition()
+}
 
 const setProperGroups = (c) => {
     if (c.userData.position.z === 1) {
@@ -295,55 +236,40 @@ const setProperGroups = (c) => {
     }
 }
 
-const rotate = (key)=>{
-    if(key == 'F'){
-        groupF.forEach((child) => {
-            Front_Group.attach(child)
-        })
-        scene.add(Front_Group)
-        gsap.to(Front_Group.rotation, {
-            duration: 1,
-            z: Math.PI / 2,
-            onComplete: () => {
-                clearGroups()
-                scene.traverse((child) => {
-                    if (!child.isMesh) return
-                    let vecnew = new $three.Vector3()
-                    child.localToWorld(vecnew)
-                    vecnew.round()
-                    child.userData.position = vecnew
-                    setProperGroups(child)
-                })
-            }
-        })
-    }
-    if(key == 'R'){
-        groupR.forEach((child) => {
-            console.log(child)
-            Right_Group.attach(child)
-        })
-        scene.add(Right_Group)
-        gsap.to(Right_Group.rotation, {
-            duration: 1,
-            x: Math.PI / 2,
-            onComplete: () => {
-                clearGroups()
-                scene.traverse((child) => {
-                    if (!child.isMesh) return
-                    let vecnew = new $three.Vector3()
-                    child.localToWorld(vecnew)
-                    vecnew.round()
-                    child.userData.position = vecnew
-                    setProperGroups(child)
-                })
-            }
-        })
-    }
-}
+const rotate = (key) => {
 
-const loadTextures = () => {
-    const loader = new $three.TextureLoader()
-    
+    switch (key) {
+        case 'F':
+            groupF.forEach((child) => {
+                Front_Group.attach(child)
+            })
+            scene.add(Front_Group)
+            gsap.to(Front_Group.rotation, {
+                duration: 1,
+                z: Math.PI / 2,
+                onComplete: () => {
+                    clearGroups()
+                    updatePosition()
+                }
+            })
+            break;
+        case 'R':
+            groupR.forEach((child) => {
+                Right_Group.attach(child)
+            })
+            scene.add(Right_Group)
+            gsap.to(Right_Group.rotation, {
+                duration: 1,
+                x: Math.PI / 2,
+                onComplete: () => {
+                    clearGroups()
+                    updatePosition()
+                }
+            })
+            break;
+        default:
+            break;
+    }
 }
 
 const addLights = () => {
@@ -420,4 +346,4 @@ useRafFn(() => {
     time.value += 0.01
     renderer.value.render(scene, camera)
 })
-</script>
+</script>~/helpers/colorCube
