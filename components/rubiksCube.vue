@@ -8,8 +8,8 @@ import { useWindowSize, useDevicePixelRatio, useRafFn } from '@vueuse/core'
 import { updateRenderer } from '~/helpers/updateRenderer';
 import { updateCamera } from '~/helpers/updateCamera';
 import { colorCube } from '~/helpers/colorCube';
-import fragmentShader from '~/shaders/fragment.glsl'
-import vertexShader from '~/shaders/vertex.glsl'
+// import fragmentShader from '~/shaders/fragment.glsl'
+// import vertexShader from '~/shaders/vertex.glsl'
 import gsap from 'gsap';
 
 defineExpose({
@@ -30,19 +30,11 @@ const orbitControl = ref(null)
 
 
 const time = ref(0)
-const uProgress = ref(0)
+// const uProgress = ref(0)
 
 const aspect = computed(() => width.value / height.value)
 
 const gRubiks = new $three.Group()
-
-const red_texture = new $three.TextureLoader().load('assets/Cube/red.png')
-const blue_texture = new $three.TextureLoader().load('assets/Cube/blue.png')
-const green_texture = new $three.TextureLoader().load('assets/Cube/green.png')
-const yellow_texture = new $three.TextureLoader().load('assets/Cube/yellow.png')
-const orange_texture = new $three.TextureLoader().load('assets/Cube/orange.png')
-const white_texture = new $three.TextureLoader().load('assets/Cube/white.png')
-const black_texture = new $three.TextureLoader().load('assets/Cube/black.png')
 
 const animation_running = ref(false)
 let t1 = gsap.timeline(
@@ -76,15 +68,6 @@ let groupD = [];
 let groupMV = [];
 let groupMH = [];
 
-const cubeSingleFaces = [
-    { x: 0, y: 0, z: 1, map: blue_texture },
-    { x: 0, y: 0, z: -1, map: white_texture },
-    { x: 0, y: 1, z: 0, map: red_texture },
-    { x: 0, y: -1, z: 0, map: yellow_texture },
-    { x: 1, y: 0, z: 0, map: green_texture },
-    { x: -1, y: 0, z: 0, map: orange_texture },
-]
-
 const scene = useScene()
 const camera = useCamera({
     cameraType: 'Perspective',
@@ -102,7 +85,6 @@ scene.add(camera)
 const geometry = new $three.BoxGeometry(1, 1, 1, 20, 20, 20);
 geometry.needsUpdate = true
 const material = new $three.MeshBasicMaterial({
-    map: black_texture,
     side: $three.DoubleSide,
 });
 
@@ -122,6 +104,16 @@ const buildTheCube = () => {
                 }
                 const sumOfPositions = i + j + k
                 if (i === 0 && j === 0 && k === 0) continue
+                if(sumOfPositions == 1 || sumOfPositions == -1) {
+                    mesh.userData = {
+                        ...mesh.userData,
+                        type: 'center'
+                    }
+                    const findExactCube = colorCube('center', { i, j, k })
+                    if (findExactCube) {
+                        mesh.material = new $three.MeshBasicMaterial({ map: findExactCube.map })
+                    }
+                }
                 if (i !== 0 && j !== 0 && k !== 0) {
                     mesh.userData = {
                         ...mesh.userData,
@@ -163,16 +155,6 @@ const buildTheCube = () => {
     console.log(gRubiks.children)
 }
 
-const colorCenter = () => {
-    cubeSingleFaces.forEach((e, i) => {
-        gRubiks.children.forEach((child) => {
-            if (!child.isMesh) return
-            if (child.position.x === e.x && child.position.y === e.y && child.position.z === e.z) {
-                child.material = new $three.MeshBasicMaterial({ map: e.map })
-            }
-        })
-    })
-}
 
 const clearGroups = () => {
     groupF = []
@@ -200,12 +182,12 @@ const updatePosition = () => {
         child.localToWorld(vecnew)
         vecnew.round()
         child.userData.position = vecnew
-        setProperGroups(child)
+        setGroups(child)
     })
 }
 
 
-const setProperGroups = (c) => {
+const setGroups = (c) => {
     if (c.userData.position.z === 1) {
         groupF.push(c)
     }
@@ -338,7 +320,6 @@ const createRenderer = () => {
     orbitControl.value = new $orbitControls(camera, renderer.value.domElement)
     addLights()
     buildTheCube()
-    colorCenter()
 }
 
 const setRenderer = () => {
@@ -351,8 +332,6 @@ const setRenderer = () => {
         scene: scene,
         camera: camera,
     })
-    // setGroups()
-    // loadModel()
 }
 
 

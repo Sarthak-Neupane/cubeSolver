@@ -6,6 +6,5 @@ export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.provide('three', THREE);
     nuxtApp.provide('orbitControls', OrbitControls);
     nuxtApp.provide('gltfLoader', GLTFLoader);
-    console.log('three.client.js');
     return
 });
