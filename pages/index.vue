@@ -9,6 +9,8 @@ const R_clicked = ref(1)
 const L_clicked = ref(1)
 const U_clicked = ref(1)
 const D_clicked = ref(1)
+const MV_clicked = ref(1)
+const MH_clicked = ref(1)
 
 const clickedF = ()=>{
     F_clicked.value++
@@ -17,6 +19,7 @@ const clickedF = ()=>{
 }
 const clickedB = ()=>{
     B_clicked.value++
+    three.value.rotate('B')
 }
 const clickedR = ()=>{
     R_clicked.value++
@@ -24,12 +27,23 @@ const clickedR = ()=>{
 }
 const clickedL = ()=>{
     L_clicked.value++
+    three.value.rotate('L')
 }
 const clickedU = ()=>{
     U_clicked.value++
+    three.value.rotate('U')
 }
 const clickedD = ()=>{
     D_clicked.value++
+    three.value.rotate('D')
+}
+const clickedMv = ()=>{
+    MV_clicked.value++
+    three.value.rotate('MV')
+}
+const clickedMh = ()=>{
+    MH_clicked.value++
+    three.value.rotate('MH')
 }
 
 </script>
@@ -41,7 +55,9 @@ const clickedD = ()=>{
     <button class="mr-4" @click="clickedL">Click L</button>
     <button class="mr-4" @click="clickedU">Click U</button>
     <button class="mr-4" @click="clickedD">Click D</button>
+    <button class="mr-4" @click="clickedMv" > Click Middle Vertical </button>
+    <button class="mr-4" @click="clickedMh" > Click Middle Horizontal </button>
     <client-only>
-        <three-background :F="F_clicked" :B="B_clicked" :R="R_clicked" :L="L_clicked" :U="U_clicked" :D="D_clicked" ref="three" ></three-background>
+        <rubiks-cube ref="three" ></rubiks-cube>
     </client-only>
 </template>

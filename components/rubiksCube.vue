@@ -12,34 +12,6 @@ import fragmentShader from '~/shaders/fragment.glsl'
 import vertexShader from '~/shaders/vertex.glsl'
 import gsap from 'gsap';
 
-
-const props = defineProps({
-    F: {
-        type: Number,
-        default: 0
-    },
-    B: {
-        type: Number,
-        default: 0
-    },
-    R: {
-        type: Number,
-        default: 0
-    },
-    L: {
-        type: Number,
-        default: 0
-    },
-    U: {
-        type: Number,
-        default: 0
-    },
-    D: {
-        type: Number,
-        default: 0
-    },
-})
-
 defineExpose({
     rotate: (key) => {
         rotate(key)
@@ -48,7 +20,6 @@ defineExpose({
 
 const { $three } = useNuxtApp()  // plugins
 const { $orbitControls } = useNuxtApp()  // plugins
-const { $gltfLoader } = useNuxtApp()  // plugins
 
 const { width, height } = useWindowSize()  // vueuse
 const { pixelRatio } = useDevicePixelRatio() // vueuse
@@ -73,18 +44,37 @@ const orange_texture = new $three.TextureLoader().load('assets/Cube/orange.png')
 const white_texture = new $three.TextureLoader().load('assets/Cube/white.png')
 const black_texture = new $three.TextureLoader().load('assets/Cube/black.png')
 
+const animation_running = ref(false)
+let t1 = gsap.timeline(
+    {
+        duration: 0.5,
+        onStart: () => {
+            animation_running.value = true
+        },
+        onComplete: () => {
+            clearGroups()
+            updatePosition()
+            animation_running.value = false
+        }
+    }
+)
+
 let Front_Group = null
 let Right_Group = null
 let Back_Group = null
 let Left_Group = null
 let Up_Group = null
 let Down_Group = null
+let Middle_Vertical_Group = null
+let Middle_Horizontal_Group = null
 let groupF = []
 let groupB = [];
 let groupR = [];
 let groupL = [];
 let groupU = [];
 let groupD = [];
+let groupMV = [];
+let groupMH = [];
 
 const cubeSingleFaces = [
     { x: 0, y: 0, z: 1, map: blue_texture },
@@ -191,12 +181,16 @@ const clearGroups = () => {
     groupL = [];
     groupU = [];
     groupD = [];
+    groupMV = [];
+    groupMH = [];
     Front_Group = new $three.Group()
     Right_Group = new $three.Group()
     Back_Group = new $three.Group()
     Left_Group = new $three.Group()
     Up_Group = new $three.Group()
     Down_Group = new $three.Group()
+    Middle_Vertical_Group = new $three.Group()
+    Middle_Horizontal_Group = new $three.Group()
 }
 
 const updatePosition = () => {
@@ -210,10 +204,6 @@ const updatePosition = () => {
     })
 }
 
-const setGroups = () => {
-    clearGroups()
-    updatePosition()
-}
 
 const setProperGroups = (c) => {
     if (c.userData.position.z === 1) {
@@ -234,23 +224,24 @@ const setProperGroups = (c) => {
     if (c.userData.position.y === -1) {
         groupD.push(c)
     }
+    if (c.userData.position.x === 0) {
+        groupMV.push(c)
+    }
+    if (c.userData.position.y === 0) {
+        groupMH.push(c)
+    }
 }
 
 const rotate = (key) => {
-
+    if (animation_running.value) return
     switch (key) {
         case 'F':
             groupF.forEach((child) => {
                 Front_Group.attach(child)
             })
             scene.add(Front_Group)
-            gsap.to(Front_Group.rotation, {
-                duration: 1,
+            t1.to(Front_Group.rotation, {
                 z: Math.PI / 2,
-                onComplete: () => {
-                    clearGroups()
-                    updatePosition()
-                }
             })
             break;
         case 'R':
@@ -258,13 +249,62 @@ const rotate = (key) => {
                 Right_Group.attach(child)
             })
             scene.add(Right_Group)
-            gsap.to(Right_Group.rotation, {
-                duration: 1,
+            t1.to(Right_Group.rotation, {
                 x: Math.PI / 2,
-                onComplete: () => {
-                    clearGroups()
-                    updatePosition()
-                }
+            })
+            break;
+        case 'B':
+            groupB.forEach((child) => {
+                Back_Group.attach(child)
+            })
+            scene.add(Back_Group)
+            t1.to(Back_Group.rotation, {
+                z: -Math.PI / 2,
+            })
+            break;
+        case 'L':
+            groupL.forEach((child) => {
+                Left_Group.attach(child)
+            })
+            scene.add(Left_Group)
+            t1.to(Left_Group.rotation, {
+                x: -Math.PI / 2,
+            })
+            break;
+        case 'U':
+            groupU.forEach((child) => {
+                Up_Group.attach(child)
+            })
+            scene.add(Up_Group)
+            t1.to(Up_Group.rotation, {
+                y: Math.PI / 2,
+            })
+            break;
+        case 'D':
+            groupD.forEach((child) => {
+                Down_Group.attach(child)
+            })
+            scene.add(Down_Group)
+            t1.to(Down_Group.rotation, {
+                y: -Math.PI / 2,
+            })
+            break;
+        case 'MV':
+            groupMV.forEach((child) => {
+                Middle_Vertical_Group.attach(child)
+            })
+            scene.add(Middle_Vertical_Group)
+            t1.to(Middle_Vertical_Group.rotation, {
+                x: -Math.PI / 2,
+            })
+            break;
+        case 'MH':
+            groupMH.forEach((child) => {
+                Middle_Horizontal_Group.attach(child)
+            })
+            scene.add(Middle_Horizontal_Group)
+            t1.to(Middle_Horizontal_Group.rotation, {
+                y: Math.PI / 2,
             })
             break;
         default:
@@ -296,6 +336,9 @@ const createRenderer = () => {
         setRenderer()
     }
     orbitControl.value = new $orbitControls(camera, renderer.value.domElement)
+    addLights()
+    buildTheCube()
+    colorCenter()
 }
 
 const setRenderer = () => {
@@ -308,25 +351,10 @@ const setRenderer = () => {
         scene: scene,
         camera: camera,
     })
-    addLights()
-    buildTheCube()
-    colorCenter()
-    setGroups()
+    // setGroups()
     // loadModel()
 }
 
-
-const loadModel = () => {
-    const loader = new $gltfLoader()
-    loader.load('assets/scene.gltf', (gltf) => {
-        scene.add(gltf.scene)
-        gltf.scene.position.set(0, 0, 0)
-        gltf.scene.scale.set(35, 35, 35)
-        console.log(gltf)
-    }, () => { }, (error) => {
-        console.log(error)
-    })
-}
 
 onMounted(() => {
     createRenderer()
@@ -346,4 +374,4 @@ useRafFn(() => {
     time.value += 0.01
     renderer.value.render(scene, camera)
 })
-</script>~/helpers/colorCube
+</script>
