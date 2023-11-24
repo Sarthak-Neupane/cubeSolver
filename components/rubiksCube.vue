@@ -15,6 +15,9 @@ import gsap from 'gsap';
 defineExpose({
     rotate: (key) => {
         rotate(key)
+    },
+    scramble: () => {
+        scramble()
     }
 })
 
@@ -291,6 +294,18 @@ const rotate = (key) => {
         default:
             break;
     }
+}
+
+const scramble = () => {
+    if (animation_running.value) return
+    const random_array = ['F', 'B', 'R', 'L', 'U', 'D', 'MV', 'MH']
+    let moves = 0
+    const interval = setInterval(() => {
+        const random_number = Math.floor(Math.random() * 8)
+        rotate(random_array[random_number])
+        moves++
+        if (moves === 10) clearInterval(interval)
+    }, 600)
 }
 
 const addLights = () => {

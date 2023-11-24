@@ -46,6 +46,10 @@ const clickedMh = ()=>{
     three.value.rotate('MH')
 }
 
+const scramble = ()=>{
+    three.value.scramble()
+}
+
 </script>
 
 <template>
@@ -57,6 +61,7 @@ const clickedMh = ()=>{
     <button class="mr-4" @click="clickedD">Click D</button>
     <button class="mr-4" @click="clickedMv" > Click Middle Vertical </button>
     <button class="mr-4" @click="clickedMh" > Click Middle Horizontal </button>
+    <button class="mr-4" @click="scramble"> Scramble </button>
     <client-only>
         <rubiks-cube ref="three" ></rubiks-cube>
     </client-only>
