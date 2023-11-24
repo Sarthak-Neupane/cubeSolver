@@ -71,7 +71,7 @@ let groupMH = [];
 const scene = useScene()
 const camera = useCamera({
     cameraType: 'Perspective',
-    position: { x: 0, y: 0, z: 10 },
+    position: { x: 5, y: 5, z: 5 },
     fov: 75,
     // fov: (180 * (2 * Math.atan(height.value / 2 / 0.5))) / Math.PI,
     aspect: aspect.value,
@@ -98,9 +98,9 @@ const buildTheCube = () => {
                 const mesh = new $three.Mesh(geometryCloned, materialCloned)
                 gRubiks.add(mesh)
                 mesh.position.set(i, j, k)
-                let position = new $three.Vector3(i, j, k)
+                // let position = new $three.Vector3(i, j, k)
                 mesh.userData = {
-                    position: position
+                    position: new $three.Vector3(i, j, k)
                 }
                 const sumOfPositions = i + j + k
                 if (i === 0 && j === 0 && k === 0) continue
@@ -152,7 +152,6 @@ const buildTheCube = () => {
         }
     }
     scene.add(gRubiks)
-    console.log(gRubiks.children)
 }
 
 
@@ -223,7 +222,7 @@ const rotate = (key) => {
             })
             scene.add(Front_Group)
             t1.to(Front_Group.rotation, {
-                z: Math.PI / 2,
+                z: -Math.PI / 2,
             })
             break;
         case 'R':
@@ -232,7 +231,7 @@ const rotate = (key) => {
             })
             scene.add(Right_Group)
             t1.to(Right_Group.rotation, {
-                x: Math.PI / 2,
+                x: -Math.PI / 2,
             })
             break;
         case 'B':
@@ -259,7 +258,7 @@ const rotate = (key) => {
             })
             scene.add(Up_Group)
             t1.to(Up_Group.rotation, {
-                y: Math.PI / 2,
+                y: -Math.PI / 2,
             })
             break;
         case 'D':
@@ -286,7 +285,7 @@ const rotate = (key) => {
             })
             scene.add(Middle_Horizontal_Group)
             t1.to(Middle_Horizontal_Group.rotation, {
-                y: Math.PI / 2,
+                y: -Math.PI / 2,
             })
             break;
         default:
@@ -345,12 +344,13 @@ watch(aspect, () => {
         fov: 75,
         // fov: (180 * (2 * Math.atan(height.value / 2 / 0.5))) / Math.PI,
     })
-    orbitControl.value.update()
+    // orbitControl.value.update()
     setRenderer()
 })
 
 useRafFn(() => {
     time.value += 0.01
     renderer.value.render(scene, camera)
+    orbitControl.value.update()
 })
 </script>
