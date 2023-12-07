@@ -1,10 +1,10 @@
 <template>
-    <div class="fixed top-0 left-0 -z-10 h-screen w-full" ref="threeElem">
+    <div class="relative top-0 left-0 h-[50vh] w-[50vw]" ref="threeElem">
     </div>
 </template>
 
 <script setup>
-import { useWindowSize, useDevicePixelRatio, useRafFn } from '@vueuse/core'
+import { useWindowSize, useDevicePixelRatio, useRafFn, useResizeObserver } from '@vueuse/core'
 import { updateRenderer } from '~/helpers/updateRenderer';
 import { updateCamera } from '~/helpers/updateCamera';
 import { colorCube } from '~/helpers/colorCube';
@@ -18,6 +18,9 @@ defineExpose({
     },
     scramble: () => {
         scramble()
+    },
+    resetCamera: () => {
+        orbitControl.value.reset()
     }
 })
 
@@ -32,10 +35,29 @@ const renderer = ref(null)
 const orbitControl = ref(null)
 
 
+const c_width = ref(0)
+const c_height = ref(0)
+
 const time = ref(0)
 // const uProgress = ref(0)
 
-const aspect = computed(() => width.value / height.value)
+const aspect = computed(() => c_width.value / c_height.value)
+
+const get_fov = () => {
+    if (width.value < 450) {
+        return 0.35 * (180 * (2 * Math.atan(c_height.value / 2 / 5))) / Math.PI
+    }
+    if (width.value < 800) {
+        return 0.75 * (180 * (2 * Math.atan(c_height.value / 2 / 5))) / Math.PI
+    }
+    if (width.value < 1300) {
+        return 50
+    }
+    if (width.value < 1800) {
+        return 45
+    }
+    return 40
+}
 
 const gRubiks = new $three.Group()
 
@@ -75,11 +97,12 @@ const scene = useScene()
 const camera = useCamera({
     cameraType: 'Perspective',
     position: { x: 5, y: 5, z: 5 },
-    fov: 75,
-    // fov: (180 * (2 * Math.atan(height.value / 2 / 0.5))) / Math.PI,
+    // fov: 50,
+    // fov: (180 * (2 * Math.atan(c_height.value / 2 / 5))) / Math.PI,
+    fov: get_fov(),
     aspect: aspect.value,
     near: 0.1,
-    far: 1000,
+    far: 10,
 })
 
 scene.add(camera)
@@ -228,6 +251,15 @@ const rotate = (key) => {
                 z: -Math.PI / 2,
             })
             break;
+        case 'F_':
+            groupF.forEach((child) => {
+                Front_Group.attach(child)
+            })
+            scene.add(Front_Group)
+            t1.to(Front_Group.rotation, {
+                z: Math.PI / 2,
+            })
+            break;
         case 'R':
             groupR.forEach((child) => {
                 Right_Group.attach(child)
@@ -235,6 +267,15 @@ const rotate = (key) => {
             scene.add(Right_Group)
             t1.to(Right_Group.rotation, {
                 x: -Math.PI / 2,
+            })
+            break;
+        case 'R_':
+            groupR.forEach((child) => {
+                Right_Group.attach(child)
+            })
+            scene.add(Right_Group)
+            t1.to(Right_Group.rotation, {
+                x: Math.PI / 2,
             })
             break;
         case 'B':
@@ -246,6 +287,15 @@ const rotate = (key) => {
                 z: -Math.PI / 2,
             })
             break;
+        case 'B_':
+            groupB.forEach((child) => {
+                Back_Group.attach(child)
+            })
+            scene.add(Back_Group)
+            t1.to(Back_Group.rotation, {
+                z: Math.PI / 2,
+            })
+            break;
         case 'L':
             groupL.forEach((child) => {
                 Left_Group.attach(child)
@@ -253,6 +303,15 @@ const rotate = (key) => {
             scene.add(Left_Group)
             t1.to(Left_Group.rotation, {
                 x: -Math.PI / 2,
+            })
+            break;
+        case 'L_':
+            groupL.forEach((child) => {
+                Left_Group.attach(child)
+            })
+            scene.add(Left_Group)
+            t1.to(Left_Group.rotation, {
+                x: Math.PI / 2,
             })
             break;
         case 'U':
@@ -264,6 +323,15 @@ const rotate = (key) => {
                 y: -Math.PI / 2,
             })
             break;
+        case 'U_':
+            groupU.forEach((child) => {
+                Up_Group.attach(child)
+            })
+            scene.add(Up_Group)
+            t1.to(Up_Group.rotation, {
+                y: Math.PI / 2,
+            })
+            break;
         case 'D':
             groupD.forEach((child) => {
                 Down_Group.attach(child)
@@ -271,6 +339,15 @@ const rotate = (key) => {
             scene.add(Down_Group)
             t1.to(Down_Group.rotation, {
                 y: -Math.PI / 2,
+            })
+            break;
+        case 'D_':
+            groupD.forEach((child) => {
+                Down_Group.attach(child)
+            })
+            scene.add(Down_Group)
+            t1.to(Down_Group.rotation, {
+                y: Math.PI / 2,
             })
             break;
         case 'MV':
@@ -282,6 +359,15 @@ const rotate = (key) => {
                 x: -Math.PI / 2,
             })
             break;
+        case 'MV_':
+            groupMV.forEach((child) => {
+                Middle_Vertical_Group.attach(child)
+            })
+            scene.add(Middle_Vertical_Group)
+            t1.to(Middle_Vertical_Group.rotation, {
+                x: Math.PI / 2,
+            })
+            break;
         case 'MH':
             groupMH.forEach((child) => {
                 Middle_Horizontal_Group.attach(child)
@@ -289,6 +375,15 @@ const rotate = (key) => {
             scene.add(Middle_Horizontal_Group)
             t1.to(Middle_Horizontal_Group.rotation, {
                 y: -Math.PI / 2,
+            })
+            break;
+        case 'MH_':
+            groupMH.forEach((child) => {
+                Middle_Horizontal_Group.attach(child)
+            })
+            scene.add(Middle_Horizontal_Group)
+            t1.to(Middle_Horizontal_Group.rotation, {
+                y: Math.PI / 2,
             })
             break;
         default:
@@ -329,6 +424,10 @@ const createRenderer = () => {
             },
             parent: threeElem.value,
         })
+        c_width.value = threeElem.value.clientWidth
+        c_height.value = threeElem.value.clientHeight
+        renderer.value.setPixelRatio(pixelRatio.value)
+        renderer.value.setSize(c_width.value, c_height.value)
         setRenderer()
     }
     orbitControl.value = new $orbitControls(camera, renderer.value.domElement)
@@ -339,8 +438,8 @@ const createRenderer = () => {
 const setRenderer = () => {
     updateRenderer(renderer.value, {
         size: {
-            width: width.value,
-            height: height.value,
+            width: c_width.value,
+            height: c_height.value,
         },
         pixelRatio: pixelRatio.value,
         scene: scene,
@@ -356,11 +455,20 @@ onMounted(() => {
 watch(aspect, () => {
     updateCamera(camera, {
         aspect: aspect.value,
-        fov: 75,
-        // fov: (180 * (2 * Math.atan(height.value / 2 / 0.5))) / Math.PI,
+        // fov: 50,
+        // fov: 0.35 * (180 * (2 * Math.atan(c_height.value / 2 / 5))) / Math.PI,
+        fov: get_fov(),
     })
     // orbitControl.value.update()
     setRenderer()
+})
+
+// const el = ref(null)
+
+useResizeObserver(threeElem, (entries) => {
+    c_width.value = threeElem.value.clientWidth
+    c_height.value = threeElem.value.clientHeight
+    // setRenderer()
 })
 
 useRafFn(() => {

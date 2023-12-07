@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   build:{
     transpile: ["gsap", "three"],
   },
-  modules: ["@nuxtjs/tailwindcss"],
+  modules: ["@nuxtjs/tailwindcss", '@nuxtjs/google-fonts'],
   vite: {
     plugins: [
       glsl({
@@ -19,5 +19,18 @@ export default defineNuxtConfig({
         ],
       }),
     ],
+  },
+  googleFonts: {
+    families: {
+      'Rubik+Moonrocks': true,
+      'Rubik': true,
+    },
+    display: 'swap',
+    prefetch: true,
+    preconnect: true,
+    preload: true,
+  },
+  tailwindcss: {
+    // exposeConfig: true,
   },
 })

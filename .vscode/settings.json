@@ -1,3 +1,4 @@
 {
-    "nuxt.isNuxtApp": false
+    "nuxt.isNuxtApp": false,
+    // "tailwindCSS.experimental.configFile": ".nuxt/tailwind.config.cjs"
 }
