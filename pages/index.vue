@@ -127,6 +127,10 @@ const reset_camera = () => {
             </div>
             <section class="relative">
                 <client-only>
+                    <template #fallback>
+                        <!-- this will be rendered on server side -->
+                        <p>Loading The Cube...</p>
+                    </template>
                     <rubiks-cube ref="three"></rubiks-cube>
                 </client-only>
             </section>

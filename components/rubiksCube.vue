@@ -97,8 +97,6 @@ const scene = useScene()
 const camera = useCamera({
     cameraType: 'Perspective',
     position: { x: 5, y: 5, z: 5 },
-    // fov: 50,
-    // fov: (180 * (2 * Math.atan(c_height.value / 2 / 5))) / Math.PI,
     fov: get_fov(),
     aspect: aspect.value,
     near: 0.1,
@@ -124,7 +122,6 @@ const buildTheCube = () => {
                 const mesh = new $three.Mesh(geometryCloned, materialCloned)
                 gRubiks.add(mesh)
                 mesh.position.set(i, j, k)
-                // let position = new $three.Vector3(i, j, k)
                 mesh.userData = {
                     position: new $three.Vector3(i, j, k)
                 }
