@@ -3,13 +3,13 @@ export const colorCube = (type, pos)=>{
     const { i, j, k } = pos
     let exactCube = null
     
-    const red_texture = new $three.TextureLoader().load('assets/Cube/red.png')
-    const blue_texture = new $three.TextureLoader().load('assets/Cube/blue.png')
-    const green_texture = new $three.TextureLoader().load('assets/Cube/green.png')
-    const yellow_texture = new $three.TextureLoader().load('assets/Cube/yellow.png')
-    const orange_texture = new $three.TextureLoader().load('assets/Cube/orange.png')
-    const white_texture = new $three.TextureLoader().load('assets/Cube/white.png')
-    const black_texture = new $three.TextureLoader().load('assets/Cube/black.png')
+    const red_texture = new $three.TextureLoader().load('./static/Cube/red.png')
+    const blue_texture = new $three.TextureLoader().load('./static/Cube/blue.png')
+    const green_texture = new $three.TextureLoader().load('./static/Cube/green.png')
+    const yellow_texture = new $three.TextureLoader().load('./static/Cube/yellow.png')
+    const orange_texture = new $three.TextureLoader().load('./static/Cube/orange.png')
+    const white_texture = new $three.TextureLoader().load('./static/Cube/white.png')
+    const black_texture = new $three.TextureLoader().load('./static/Cube/black.png')
 
     const cubeThreeFaces = [
         { x: -1, y: -1, z: -1, textures: [black_texture, orange_texture, black_texture, yellow_texture, black_texture, white_texture] },
